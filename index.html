@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stylish Form Site</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-6">
+  <div class="max-w-2xl mx-auto">
+    <nav class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold">My Stylish Site</h1>
+      <div class="space-x-4">
+        <button onclick="showPage('home')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded">Home</button>
+        <button onclick="showPage('form')" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded">Form Page</button>
+      </div>
+    </nav>
+
+    <div id="homePage" class="text-center mt-24">
+      <h2 class="text-4xl font-semibold mb-4">Welcome to the Home Page</h2>
+      <p class="text-lg text-gray-300">Explore our sleek, modern interface and try out the form page.</p>
+    </div>
+
+    <form id="formPage" onsubmit="handleSubmit(event)" class="bg-gray-700 p-6 rounded-2xl shadow-xl space-y-4 hidden">
+      <input name="name" id="name" placeholder="Name" required class="w-full px-4 py-2 rounded bg-gray-800 text-white" />
+      <textarea name="comment" id="comment" placeholder="Comment" required class="w-full px-4 py-2 rounded bg-gray-800 text-white"></textarea>
+      
+      <select id="selection" onchange="updateReadonly()" class="w-full px-4 py-2 rounded bg-gray-800 text-white">
+        <option value="One">One</option>
+        <option value="Two">Two</option>
+      </select>
+
+      <input id="readonlyText" readonly value="One text" class="w-full px-4 py-2 rounded bg-gray-800 text-white" />
+
+      <input type="file" name="file" id="file" required class="w-full text-white" />
+
+      <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">Submit</button>
+    </form>
+
+    <div id="successMessage" class="text-center mt-24 hidden">
+      <h2 class="text-3xl font-semibold text-green-400">Thank you! Your submission was successful.</h2>
+    </div>
+  </div>
+
+  <script>
+    function showPage(page) {
+      document.getElementById('homePage').classList.toggle('hidden', page !== 'home');
+      document.getElementById('formPage').classList.toggle('hidden', page !== 'form');
+      document.getElementById('successMessage').classList.add('hidden');
+    }
+
+    function updateReadonly() {
+      const select = document.getElementById('selection');
+      const readonly = document.getElementById('readonlyText');
+      readonly.value = select.value === 'One' ? 'One text' : 'Two text';
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+
+      const form = new FormData();
+      form.append('name', document.getElementById('name').value);
+      form.append('comment', document.getElementById('comment').value);
+      form.append('selection', document.getElementById('selection').value);
+      form.append('file', document.getElementById('file').files[0]);
+
+      const res = await fetch('https://my.api.com/form', {
+        method: 'POST',
+        body: form
+      });
+
+      if (res.ok) {
+        document.getElementById('formPage').classList.add('hidden');
+        document.getElementById('successMessage').classList.remove('hidden');
+      }
+    }
+
+    // Default state
+    showPage('home');
+  </script>
+</body>
+</html>
