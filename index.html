@@ -167,6 +167,12 @@ async function handleSubmit(e) {
 
     formPage.classList.add('hidden');
     successMessage.classList.remove('hidden');
+     // ✅ Clear form fields
+    document.getElementById('name').value = '';
+    document.getElementById('comment').value = '';
+    document.getElementById('selection').value = 'One';
+    updateReadonly(); // update "One text"
+    document.getElementById('file').value = '';
   } catch (err) {
     errorMessage.classList.remove('hidden');
   } finally {
