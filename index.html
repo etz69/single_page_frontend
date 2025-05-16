@@ -122,48 +122,69 @@
       document.getElementById('readonlyText').value = val === 'One' ? 'One text' : 'Two text';
     }
 
-    async function handleSubmit(e) {
-    e.preventDefault();
-   // UI elements
-    const loadingMessage = document.getElementById('loadingMessage');
-    const errorMessage = document.getElementById('errorMessage');
-    const successMessage = document.getElementById('successMessage');
-    const formPage = document.getElementById('formPage');
-    const submitBtn = e.target.querySelector("button[type='submit']");
+async function handleSubmit(e) {
+  e.preventDefault();
 
-    // 🔄 Reset previous messages
-    errorMessage.classList.add('hidden');
-    successMessage.classList.add('hidden');
+  // UI cleanup
+  const loadingMessage = document.getElementById('loadingMessage');
+  const errorMessage = document.getElementById('errorMessage');
+  const successMessage = document.getElementById('successMessage');
+  const formPage = document.getElementById('formPage');
+  const submitBtn = e.target.querySelector("button[type='submit']");
+  errorMessage.classList.add('hidden');
+  successMessage.classList.add('hidden');
 
-    
-    loadingMessage.classList.remove('hidden');
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...`;
+  loadingMessage.classList.remove('hidden');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...`;
 
-    const formData = new FormData();
-    formData.append('name', document.getElementById('name').value);
-    formData.append('comment', document.getElementById('comment').value);
-    formData.append('selection', document.getElementById('selection').value);
-    formData.append('file', document.getElementById('file').files[0]);
+  // Get file as base64
+  const fileInput = document.getElementById('file');
+  const file = fileInput.files[0];
+  const fileBase64 = await toBase64(file);
 
-    try {
-      const res = await fetch('https://single-page-backend.vercel.app/form', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!res.ok) throw new Error();
-
-      document.getElementById('formPage').classList.add('hidden');
-      document.getElementById('successMessage').classList.remove('hidden');
-    } catch (err) {
-      document.getElementById('errorMessage').classList.remove('hidden');
-    } finally {
-      loadingMessage.classList.add('hidden');
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Submit`;
+  const payload = {
+    name: document.getElementById('name').value,
+    comment: document.getElementById('comment').value,
+    selection: document.getElementById('selection').value,
+    file: {
+      filename: file.name,
+      content: fileBase64,
+      type: file.type
     }
+  };
+
+  try {
+    const res = await fetch('https://your-backend-url.vercel.app/form', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error();
+
+    formPage.classList.add('hidden');
+    successMessage.classList.remove('hidden');
+  } catch (err) {
+    errorMessage.classList.remove('hidden');
+  } finally {
+    loadingMessage.classList.add('hidden');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Submit`;
   }
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]); // Only base64 string
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 
     showPage('home');
   </script>
