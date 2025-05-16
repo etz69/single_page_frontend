@@ -124,9 +124,18 @@
 
     async function handleSubmit(e) {
     e.preventDefault();
-
+   // UI elements
     const loadingMessage = document.getElementById('loadingMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const formPage = document.getElementById('formPage');
     const submitBtn = e.target.querySelector("button[type='submit']");
+
+    // 🔄 Reset previous messages
+    errorMessage.classList.add('hidden');
+    successMessage.classList.add('hidden');
+
+    
     loadingMessage.classList.remove('hidden');
     submitBtn.disabled = true;
     submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...`;
